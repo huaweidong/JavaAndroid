@@ -1,0 +1,143 @@
+# Java面向对象
+
+## 继承
+
+使用关键字**extends**，子类可以继承父类的除private属性外所有的属性。
+
+使用instanceof 操作符，能够确定 IS-A的关系
+
+```java
+public class Mammal extends Animal {
+  ...
+}
+Mammal m = new Mammal();
+System.out.println(m instanceof Animal);
+```
+
+**Implements**关键字使用在类继承接口的情况下， 这种情况不能使用关键字**extends**。
+
+```java
+public interface Animal {}
+public class Mammal implements Animal{
+}
+```
+
+HAS-A代表类和它的成员之间的从属关系。
+
+Java只支持单继承，但是我们可以用接口来实现（多继承接口来实现）
+
+```java
+public class Apple extends Fruit implements Fruit1, Fruit2{}
+```
+
+
+
+## 重写（Override）和重载（Overload）
+
+### 重写
+
+重写是子类对父类的允许访问的方法的实现过程进行重新编写！返回值和形参都不能改变。即外壳不变，核心重写。
+
+```java
+class Animal{
+ 
+   public void move(){
+      System.out.println("动物可以移动");
+   }
+}
+ 
+class Dog extends Animal{
+ 
+   public void move(){
+      System.out.println("狗可以跑和走");
+   }
+   public void bark(){
+      System.out.println("狗可以吠叫");
+   }
+}
+ 
+public class TestDog{
+ 
+   public static void main(String args[]){
+      Animal a = new Animal(); // Animal 对象
+      Animal b = new Dog(); // Dog 对象
+ 
+      a.move();// 执行 Animal 类的方法
+ 
+      b.move();//执行 Dog 类的方法
+      b.park();//编译出错，因为Animal没有park方法。
+   }
+}
+```
+
+能编译成功，是因为Animal类中存在move方法，然而运行时，运行的是特定对象的方法。
+
+#### 方写重写的规则
+
+- 参数列表必须完全与被重写方法的相同；
+- 返回类型必须完全与被重写方法的返回类型相同；
+- 访问权限不能比父类中被重写的方法的访问权限更高。例如：如果父类的一个方法被声明为public，那么在子类中重写该方法就不能声明为protected。
+- 父类的成员方法只能被它的子类重写。
+- 声明为final的方法不能被重写。
+- 声明为static的方法不能被重写，但是能够被再次声明。
+- 如果一个方法不能被继承，那么该方法不能被重写。
+- 子类和父类在同一个包中，那么子类可以重写父类所有方法，除了声明为private和final的方法。
+- 子类和父类不在同一个包中，那么子类只能够重写父类的声明为public和protected的非final方法。
+- 重写的方法能够抛出任何非强制异常，无论被重写的方法是否抛出异常。但是，重写的方法不能抛出新的强制性异常，或者比被重写方法声明的更广泛的强制性异常，反之则可以。
+- 构造方法不能被重写。
+- 如果不能继承一个方法，则不能重写这个方法。
+
+需要在子类中调用父类的被重写方法时，要使用super关键字。
+
+### 重载
+
+重载(overloading) 是在一个类里面，方法名字相同，而参数不同。返回类型呢？可以相同也可以不同。
+
+每个重载的方法（或者构造函数）都必须有一个独一无二的参数类型列表。
+
+- 被重载的方法必须改变参数列表；
+- 被重载的方法可以改变返回类型；
+- 被重载的方法可以改变访问修饰符；
+- 被重载的方法可以声明新的或更广的检查异常；
+- 方法能够在同一个类中或者在一个子类中被重载。
+
+## 多态
+
+多态是同一个行为具有多个不同表现形式或形态的能力，是对象多种表现形式的体现。
+
+```
+public class A {
+  public void print();
+}
+public class B extends A {
+  public void print();
+}
+public class Test{
+  public static void main(String []args) {
+    B b = new B();
+    A a = new B();
+    b.print();
+    a.print();	// 编译时确定A有print方法，编译通过；运行时实际调用B.print()
+  }
+}
+```
+
+
+
+## 抽象类
+
+抽象类除了不能实例化对象之外，类的其它功能依然存在，成员变量、成员方法和构造方法的访问方式和普通类一样。
+
+由于抽象类不能实例化对象，所以抽象类必须被继承，才能被使用。
+
+```java
+public abstract class Employee
+```
+
+
+
+## 封装
+
+## 接口
+
+## 包（package）
