@@ -142,8 +142,6 @@ FileInputStream fileIn = new FileInputStream("/tmp/employee.ser");
 
 java.net包提供了两种常见的网络协议的支持TCP和UDP
 
-## 发送邮件
-
 ## 多线程编程
 
 进程：一个进程包括由操作系统分配的内存空间，包含一个或多个线程。一个线程不能独立的存在，它必须是进程的一部分。一个进程一直运行，直到所有的非守候线程都结束运行后才能结束。
