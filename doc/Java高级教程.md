@@ -102,6 +102,84 @@ Method：
 
 ## 多线程编程
 
-## Applet基础
+进程：一个进程包括由操作系统分配的内存空间，包含一个或多个线程。一个线程不能独立的存在，它必须是进程的一部分。一个进程一直运行，直到所有的非守候线程都结束运行后才能结束。
 
-## 文档注释
+每一个Java线程都有一个优先级，这样有助于操作系统确定线程的调度顺序。Java优先级在MIN_PRIORITY（1）和MAX_PRIORITY（10）之间的范围内。默认情况下，每一个线程都会分配一个优先级NORM_PRIORITY（5）。
+
+### 通过实现Runable接口
+
+```java
+class NewThread implements Runnable {
+   Thread t;
+   NewThread() {
+      // 创建第二个新线程
+      t = new Thread(this, "Demo Thread");
+      System.out.println("Child thread: " + t);
+      t.start(); // 开始线程
+   }
+   
+   // 第二个线程入口
+   public void run() {
+      try {
+         for(int i = 5; i > 0; i--) {
+            System.out.println("Child Thread: " + i);
+            // 暂停线程
+            Thread.sleep(50);
+         }
+     } catch (InterruptedException e) {
+         System.out.println("Child interrupted.");
+     }
+     System.out.println("Exiting child thread.");
+   }
+}
+```
+
+
+
+### 通过继承Thread类本身
+
+```java
+class NewThread extends Thread {
+   NewThread() {
+      // 创建第二个新线程
+      super("Demo Thread");
+      System.out.println("Child thread: " + this);
+      start(); // 开始线程
+   }
+  
+   // 第二个线程入口
+   public void run() {
+      try {
+         for(int i = 5; i > 0; i--) {
+            System.out.println("Child Thread: " + i);
+                            // 让线程休眠一会
+            Thread.sleep(50);
+         }
+      } catch (InterruptedException e) {
+         System.out.println("Child interrupted.");
+      }
+      System.out.println("Exiting child thread.");
+   }
+}
+```
+
+Thread Method实例方法：
+
+1. public void start(): 使该线程开始执行；Java 虚拟机调用该线程的 run 方法。
+2. public void run(): 如果该线程是使用独立的 Runnable 运行对象构造的，则调用该 Runnable 对象的 run 方法；否则，该方法不执行任何操作并返回。
+3. public final void setName(String name)
+4. public final void setPriority(int priority)
+5. public final void setDaemon(boolean on): 将该线程标记为守护线程或用户线程。
+6. public final void join(long millisec): 等待该线程终止的时间最长为 millis 毫秒。
+7. public void interrupt()
+8. public final boolean isAlive(): 测试线程是否处于活动状态。
+
+Thread Method静态方法：
+
+1. void yield(): 暂停当前正在执行的线程对象，并执行其他线程。
+2. void sleep(long millisec):  在指定的毫秒数内让当前正在执行的线程休眠（暂停执行），此操作受到系统计时器和调度程序精度和准确性的影响。
+3. Thread currentThread(): 返回对当前正在执行的线程对象的引用。
+4. void dumpStack(): 将当前线程的堆栈跟踪打印至标准错误流。
+
+
+

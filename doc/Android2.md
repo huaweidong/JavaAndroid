@@ -18,20 +18,20 @@
 
 ### 1.8 Gestures（手势）
 
-## 2. 四大组件
 
-### 2.1 Activity
+
+## 2. Activity
 
 1. Activity用于显示用户界面，用户通过Activity交互完成相关操作 
 2. 一个App允许有多个Activity
 
-#### 2.1.1 生命周期
+### 2.1 生命周期
 
 ![](img/activity_lifecycle.png)
 
 
 
-#### 2.1.2 创建
+### 2.2 创建
 
 ![](img/48768883.png)
 
@@ -58,8 +58,7 @@ android:persistableMode="persistAcrossReboots"
    1.  一般是在onStart()和onResume()之间执行，和onCreate同样可以从取出前面保存的数据
 
 
-
-#### 2.1.3 启动
+### 2.3 启动
 
 显式启动
 
@@ -81,7 +80,7 @@ startActivity(intent);
 
 
 
-#### 2.1.4 横竖屏切换
+### 2.4 横竖屏切换
 
 App横竖屏切换的时候会销毁当前的Activity然后重新创建一个，走的流程是：onPause-> onStop-> onDestory-> onCreate->onStart->onResume
 
@@ -103,22 +102,21 @@ else if (this.getResources().getConfiguration().orientation ==Configuration.ORIE
 
 
 
-#### 2.1.5 状态保存
+### 2.5 状态保存
 
 ```java
 onCreate(Bundle savedInstanceState);
-onSaveInstanceState(Bundle outState);
-onRestoreInstanceState(Bundle savedInstanceState);
+onSaveInstanceState(Bundle outState) {
+  outState.putInt("num",1);	// save到bundle中
+}
+onRestoreInstanceState(Bundle savedInstanceState) {
+  savedInstanceState.getInt("num");	// 从bundle中拿出来
+}
 ```
 
-```java
-outState.putInt("num",1);	// save到bundle中
-savedInstanceState.getInt("num");	// 从bundle中拿出来
-```
 
 
-
-#### 2.1.6 Activity间的数据传递
+### 2.6 Activity间的数据传递
 
 ![](img/7185831.png)
 
@@ -134,9 +132,9 @@ savedInstanceState.getInt("num");	// 从bundle中拿出来
 
 
 
-#### 2.1.7 关闭Activity的方法
+### 2.7 关闭Activity的方法
 
-##### 2.1.7.1 随时关闭所有Activity
+#### 2.7.1 随时关闭所有Activity
 
 用一个list集合来存储所有Activity
 
@@ -166,9 +164,9 @@ public class ActivityCollector {
 }  
 ```
 
-##### 2.1.7.2 完全退出App的方法，连后台任务都杀死 
+#### 2.7.2 完全退出App的方法，连后台任务都杀死
 
-```
+```java
 public void AppExit(Context context) {  
     try {  
         ActivityCollector.finishAll();  
@@ -180,22 +178,21 @@ public void AppExit(Context context) {
 }
 ```
 
-##### 2.1.7.3 双击返回退出程序的方法
+#### 2.7.3 双击返回退出程序的方法
 
 1. 定义一个变量，来标识是否退出
 2. 保存点击时间
 
 
-
-#### 2.1.8 为Activity设置过场动画
-
-
-
-#### 2.1.9 onWindowFocusChanged方法
+### 2.8 为Activity设置过场动画
 
 
 
-#### 2.1.10 定义对话框风格的Activity
+### 2.9 onWindowFocusChanged方法
+
+
+
+### 2. 10 定义对话框风格的Activity
 
 ```xml
 android:theme="@android:style/Theme.Dialog"
@@ -203,13 +200,13 @@ android:theme="@android:style/Theme.Dialog"
 
 
 
-#### 2.1.11 Activity，Window与View的关系
+### 2. 11 Activity，Window与View的关系
 
 ![img](img/93497523.jpg)
 
 
 
-#### 2.1.12 Activity，Task和Back Stack
+### 2. 12 Activity，Task和Back Stack
 
 ![img](img/93537362.png)
 
@@ -219,7 +216,7 @@ Task是Activity的集合，是一个概念，实际使用的Back Stack来存储A
 
 
 
-#### 2.1.13 Task的管理
+### 2.13 Task的管理
 
 Ref: [https://developer.android.com/guide/components/tasks-and-back-stack.html](https://developer.android.com/guide/components/tasks-and-back-stack.html)
 
@@ -229,7 +226,7 @@ Ref: [https://developer.android.com/guide/components/tasks-and-back-stack.html](
 
 
 
-#### 2.1.14 Activity的四种启动模式
+### 2.14 Activity的四种启动模式
 
 ![img](img/50179298.png)
 
@@ -249,7 +246,7 @@ Ref: [https://developer.android.com/guide/components/tasks-and-back-stack.html](
 
 
 
-#### 2.1.15 使用 Intent 标志
+### 2.15 使用 Intent 标志
 
 启动 Activity 时，您可以通过在传递给 startActivity() 的 Intent 中加入相应的标志，修改 Activity 与其任务的默认关联方式。
 
@@ -261,7 +258,7 @@ Ref: [https://developer.android.com/guide/components/tasks-and-back-stack.html](
 
 
 
-#### 2.1.16 文件关联
+### 2.16 文件关联
 
 “关联”指示 Activity 优先属于哪个任务。默认情况下，同一应用中的所有 Activity 彼此关联。 因此，默认情况下，同一应用中的所有 Activity 优先位于相同任务中。 不过，您可以修改 Activity 的默认关联。 在不同应用中定义的 Activity 可以共享关联，或者可为在同一应用中定义的 Activity 分配不同的任务关联。
 
@@ -276,7 +273,7 @@ Ref: [https://developer.android.com/guide/components/tasks-and-back-stack.html](
 
 
 
-#### 2.1.17 处理返回栈
+### 2.17 处理返回栈
 
 清空栈：当用户长时间离开Task（当前task被转移到后台）时，系统会清除task中栈底Activity外的所有Activity 。这样，当用户返回到Task时，只留下那个task最初始的Activity了。我们可以通过修改下面这些属性来 改变这种行为！
 
@@ -286,7 +283,8 @@ Ref: [https://developer.android.com/guide/components/tasks-and-back-stack.html](
 
 
 
-#### 2.1.18 启动任务
+
+### 2.18 启动任务
 
 通过为 Activity 提供一个以 "android.intent.action.MAIN" 为指定操作、以 "android.intent.category.LAUNCHER" 为指定类别的 Intent 过滤器，您可以将 Activity 设置为任务的入口点。此类 Intent 过滤器会使 Activity 的图标和标签显示在应用启动器中，让用户能够启动 Activity 并在启动之后随时返回到创建的任务中。
 
@@ -302,7 +300,7 @@ Ref: [https://developer.android.com/guide/components/tasks-and-back-stack.html](
 
 
 
-### 2.2 Service
+## 3. Service
 
 后台执行不提供用户界面。
 
@@ -317,7 +315,9 @@ Ref: [https://developer.android.com/guide/components/tasks-and-back-stack.html](
 
 > 注意：服务在其托管进程的主线程中运行，它既不创建自己的线程，也不在单独的进程中运行（除非另行指定）。 因此，如果服务将执行任何 CPU 密集型工作或阻止性操作（例如 MP3 播放或联网），则应在服务内创建新线程来完成这项工作。通过使用单独的线程，可以降低发生“应用无响应”(ANR) 错误的风险，而应用的主线程仍可继续专注于运行用户与 Activity 之间的交互。
 
-#### 2.2.1 基础知识
+
+
+### 3.1 基础知识
 
 创建 Service 的子类，应重写的回调方法包括：
 
@@ -328,19 +328,25 @@ Ref: [https://developer.android.com/guide/components/tasks-and-back-stack.html](
 
 仅当内存过低且必须回收系统资源以供具有用户焦点的 Activity 使用时，Android 系统才会强制停止服务。如果将服务绑定到具有用户焦点的 Activity，则它不太可能会终止；如果将服务声明为在前台运行（稍后讨论），则它几乎永远不会终止。
 
-#### 2.2.2 使用清单文件声明服务
+
+
+### 3.2 使用清单文件声明服务
 
 * android:name ：必需的属性，指定服务的类名。应用一旦发布，即不应更改此类名，如若不然，可能会存在因依赖显式 Intent 启动或绑定服务而破坏代码的风险。
 * android:exported=false：确保服务仅适用于您的应用
 
-#### 2.2.3 创建服务
+
+
+### 3.3 创建服务
 
 应用组件（如 Activity）可以通过调用 startService() 方法并传递 Intent 对象（指定服务并包含待使用服务的所有数据）来启动服务。服务通过 onStartCommand() 方法接收此 Intent。
 
 * **Service** ：这是适用于所有服务的基类。扩展此类时，必须创建一个用于执行所有服务工作的新线程，因为默认情况下，服务将使用应用的主线程，这会降低应用正在运行的所有 Activity 的性能。
 * **IntentService** ：这是 Service 的子类，它使用工作线程逐一处理所有启动请求。如果您**不要求服务同时处理多个请求**，这是最好的选择。 您只需实现 onHandleIntent() 方法即可，该方法会接收每个启动请求的 Intent，使您能够执行后台工作。
 
-#### 2.2.4 启动服务
+
+
+### 3.4 启动服务
 
 ```java
 Intent intent = new Intent(this, HelloService.class);
@@ -353,11 +359,15 @@ startService() 方法将立即返回，且 Android 系统调用服务的 onStart
 
 多个服务启动请求会导致多次对服务的 onStartCommand() 进行相应的调用。但是，要停止服务，只需一个服务停止请求（使用 stopSelf() 或 stopService()）即可。
 
-#### 2.2.5 停止服务
+
+
+### 3.5 停止服务
 
 使用 `stopSelf()` 或 `stopService()` 停止服务，系统就会尽快销毁服务
 
-#### 2.2.6 创建绑定服务
+
+
+### 3.6 创建绑定服务
 
 调用 `bindService()` 与其绑定
 
@@ -365,17 +375,23 @@ startService() 方法将立即返回，且 Android 系统调用服务的 onStart
 
 多个客户端可以同时绑定到服务。客户端完成与服务的交互后，会调用 unbindService() 取消绑定。一旦没有客户端绑定到该服务，系统就会销毁它。所以绑定服务不需要手动停止。
 
-#### 2.2.7 向用户发送通知
+
+
+### 3.7 向用户发送通知
 
 服务即可使用 Toast 通知或状态栏通知来通知用户所发生的事件。
 
-#### 2.2.8 在前台运行服务
+
+
+### 3.8 在前台运行服务
 
 要请求让服务运行于前台，请调用 `startForeground()`。两个参数：唯一标识通知的整型数和状态栏的 `Notification`。
 
 要从前台移除服务，请调用 `stopForeground()`。此方法采用一个布尔值，指示是否也移除状态栏通知。 此方法*不会*停止服务。 但是，如果您在服务正在前台运行时将其停止，则通知也会被移除。
 
-#### 2.2.9 管理服务生命周期
+
+
+### 3.9 管理服务生命周期
 
 服务生命周期（从创建到销毁）可以遵循两条不同的路径：
 
@@ -399,19 +415,248 @@ startService() 方法将立即返回，且 Android 系统调用服务的 onStart
 
 
 
+## 4. ContentProvider 
+
+1. 我们想在自己的应用中访问别的应用，或者说一些ContentProvider暴露给我们的一些数据， 比如手机联系人，短信等！我们想对这些数据进行读取或者修改，这就需要用到ContentProvider了！
+2. 我们自己的应用，想把自己的一些数据暴露出来，给其他的应用进行读取或操作，我们也可以用 到ContentProvider，另外我们可以选择要暴露的数据，就避免了我们隐私数据的的泄露！
+
+内容提供程序管理对结构化数据集的访问。它们封装数据，并提供用于定义数据安全性的机制。 内容提供程序是连接一个进程中的数据与另一个进程中运行的代码的标准界面。
+
+Android 本身包括的内容提供程序可管理音频、视频、图像和个人联系信息等数据。
+
+### 4.1 基本概念
+
+![img](http://www.runoob.com/wp-content/uploads/2015/08/58811327.jpg)
+
+示例：
+
+```java
+// 读取短信
+private void getMsgs(){
+    Uri uri = Uri.parse("content://sms/");
+    ContentResolver resolver = getContentResolver();
+    //获取的是哪些列的信息
+    Cursor cursor = resolver.query(uri, new String[]{"address","date","type","body"}, null, null, null);
+    while(cursor.moveToNext())
+    {
+        String address = cursor.getString(0);
+        String date = cursor.getString(1);
+        String type = cursor.getString(2);
+        String body = cursor.getString(3);
+        System.out.println("地址:" + address);
+        System.out.println("时间:" + date);
+        System.out.println("类型:" + type);
+        System.out.println("内容:" + body);
+        System.out.println("======================");
+    }
+    cursor.close();
+}
+// 读取手机联系人
+private void getContacts(){
+    //①查询raw_contacts表获得联系人的id
+    ContentResolver resolver = getContentResolver();
+    Uri uri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
+    //查询联系人数据
+    cursor = resolver.query(uri, null, null, null, null);
+    while(cursor.moveToNext())
+    {
+        //获取联系人姓名,手机号码
+        String cName = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+        String cNum = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+        System.out.println("姓名:" + cName);
+        System.out.println("号码:" + cNum);
+        System.out.println("======================");
+    }
+    cursor.close();
+}
+```
+
+### 4.2 自定义ContentProvider
+
+![img](http://www.runoob.com/wp-content/uploads/2015/08/40787698.jpg)
+
+### 4.3 通过ContentObserver监听ContentProvider的数据变化
+
+![img](http://www.runoob.com/wp-content/uploads/2015/08/34168859.jpg)
+
+### 4.4 Storage Access Framework(SAF)
+
+存储访问框架组成：
+
+1. Document provider：一个特殊的ContentProvider，让一个存储服务(比如Google Drive)可以 对外展示自己所管理的文件。它是DocumentsProvider的子类，另外，document-provider的存储格式 和传统的文件存储格式一致，至于你的内容如何存储，则完全决定于你自己，Android系统已经内置了几个 这样的Document provider，比如关于下载，图片以及视频的Document provider.
+2. Client app：一个普通的客户端软件，通过触发ACTION_OPEN_DOCUMENT 和/或 ACTION_CREATE_DOCUMENT就可以接收到来自于Document provider返回的内容，比如选择一个图片， 然后返回一个Uri. 
+3. Picker：链接调用者和内容提供者的一个桥梁，是系统级的界面，提供访问客户端过滤条件的 Document provider内容的通道。
+
+下面的流程图展示了一个photo应用使用SAF可能的结构：
+
+![img](http://www.runoob.com/wp-content/uploads/2015/08/27402348.jpg)
+
+
+
+```java
+ Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("image/*");
+        startActivity(intent);
+```
+
+
+
+## 5. BroadcastReceiver
+
+> 形象点的例子：大喇叭--> 发送广播 --> 所有学生都能收到广播 --> 大力士处理广播。
+>
+> 其实BroadcastReceiver就是应用程序间的全局大喇叭，即通信的一个手段， 系统自己在很多时候都会发送广播，比如电量低或者充足，刚启动完，插入耳机，输入法改变等， 发生这些时间，系统都会发送广播，这个叫系统广播，每个APP都会收到，如果你想让你的应用在接收到 这个广播的时候做一些操作，比如：系统开机后，偷偷后台跑服务~哈哈，这个时候你只需要为你的应用 注册一个用于监视开机的BroadcastReceiver，当接收到开机广播就做写偷偷摸摸的勾当~ 当然我们也可以自己发广播，比如：接到服务端推送信息，用户在别处登录，然后应该强制用户下线回到 登陆界面，并提示在别处登录……
+
+![img](http://www.runoob.com/wp-content/uploads/2015/08/72916726.jpg)
+
+### 5.1 接收广播
+
+接收广播需要给程序注册注册广播，有两种注册广播的方式：
+
+![img](http://www.runoob.com/wp-content/uploads/2015/08/17322218.jpg)
+
+![img](http://www.runoob.com/wp-content/uploads/2015/08/93737904.jpg)
+
+动态注册示例（网络变化）
+
+```java
+// 自定义一个BroadcastReceiver，在onReceive()方法中完成广播要处理的事务
+public class MyBRReceiver extends BroadcastReceiver{
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        Toast.makeText(context,"网络状态发生改变~",Toast.LENGTH_SHORT).show();
+    }
+}
+```
+
+```java
+// 注册动态广播
+public class MainActivity extends AppCompatActivity {
+
+    MyBRReceiver myReceiver;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        //核心部分代码：
+        myReceiver = new MyBRReceiver();
+        IntentFilter itFilter = new IntentFilter();
+        itFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
+        registerReceiver(myReceiver, itFilter);
+    }
+
+    //别忘了将广播取消掉哦~
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(myReceiver);
+    }
+}
+```
+
+静态注册示例（接收开机广播）
+
+```java
+// 自定义一个BroadcastReceiver，重写onReceive完成事务处理
+public class BootCompleteReceiver extends BroadcastReceiver {
+    private final String ACTION_BOOT = "android.intent.action.BOOT_COMPLETED";
+    @Override
+    public void onReceive(Context context, Intent intent) {
+    if (ACTION_BOOT.equals(intent.getAction()))
+        Toast.makeText(context, "开机完毕~", Toast.LENGTH_LONG).show();
+    }
+}
+```
+
+```xml
+<!--在AndroidManifest.xml中对该BroadcastReceiver进行注册，添加开机广播的intent-filter-->
+<receiver android:name=".BootCompleteReceiver">
+    <intent-filter>
+        <action android:name = "android.intent.cation.BOOT_COMPLETED">
+    </intent-filter>
+</receiver>
+
+<!-- 权限 -->
+<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+```
+
+> 不要在广播里添加过多逻辑或者进行任何耗时操作,因为在广播中是不允许开辟线程的, 当onReceiver( )方法运行较长时间(超过10秒)还没有结束的话,那么程序会报错(ANR), 广播更多的时候扮演的是一个打开其他组件的角色,比如启动Service,Notification提示, Activity等！
+
+
+
+### 5.2 发送广播
+
+![img](http://www.runoob.com/wp-content/uploads/2015/08/47229905.jpg)
+
+### 5.3 本地广播
+
+前面写的广播都是全局广播！这同样意味着我们APP发出的广播，其他APP都会接收到， 或者其他APP发送的广播，我们的APP也同样会接收到，这样容易引起一些安全性的问题！而 Android中给我们提供了本地广播的机制，使用该机制发出的广播只会在APP内部传播，而且 广播接收者也只能收到本应用发出的广播！
+
+![img](http://www.runoob.com/wp-content/uploads/2015/08/96168525.jpg)
+
+![img](http://www.runoob.com/wp-content/uploads/2015/08/59582423.jpg)
+
+示例：别处登陆踢用户下线
+
+1. 准备一个关闭所有Activity的ActivityCollector
+2. 先写要给简单的BaseActivity，用来继承，接着写下登陆界面！
+3. 自定义一个BroadcastReceiver，在onReceive里完成弹出对话框操作，以及启动登陆页面
+4. 在MainActivity中，实例化localBroadcastManager，拿他完成相关操作，另外销毁时 注意unregisterReceiver.
+
+```java
+public class MainActivity extends BaseActivity {
+
+    private MyBcReceiver localReceiver;
+    private LocalBroadcastManager localBroadcastManager;
+    private IntentFilter intentFilter;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        localBroadcastManager = LocalBroadcastManager.getInstance(this);
+
+        //初始化广播接收者，设置过滤器
+        localReceiver = new MyBcReceiver();
+        intentFilter = new IntentFilter();
+        intentFilter.addAction("com.jay.mybcreceiver.LOGIN_OTHER");
+        localBroadcastManager.registerReceiver(localReceiver, intentFilter);
+
+        Button btn_send = (Button) findViewById(R.id.btn_send);
+        btn_send.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent("com.jay.mybcreceiver.LOGIN_OTHER");
+                localBroadcastManager.sendBroadcast(intent);
+            }
+        });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        localBroadcastManager.unregisterReceiver(localReceiver);
+    }
+}
+```
+
+### 5.4 常用的系统广播
 
 
 
 
-### 2.3 BroadcastReceiver
-
-### 2.4 ContentProvider
-
-### 2.5 Intent
 
 
 
-### 2.6 进程和线程
+
+
+## 6. Intent
+
+
+
+## 7. 进程和线程
 
 Ref: [https://developer.android.com/guide/components/processes-and-threads.html](https://developer.android.com/guide/components/processes-and-threads.html)
 
@@ -511,17 +756,17 @@ Android 利用远程过程调用 (RPC) 提供了一种进程间通信 (IPC) 机�
 
 
 
-## Fragment
+## 8. Fragment
 
-## 数据存储
+## 9. 数据存储
 
-### 文件读写
+### 9.1 File
 
-### SharedPreferences
+### 9.2 SharedPreferences
 
-### SQLite
+### 9.3 SQLite
 
-## 网络编程
+## 10. 网络编程
 
 
 
