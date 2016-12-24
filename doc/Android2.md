@@ -4,7 +4,148 @@
 
 ### 1.1 基于监听的事件处理机制
 
+流程模型图
+
+![](http://www.runoob.com/wp-content/uploads/2015/07/4109430.jpg)
+
+事件监听机制中由**事件源**，**事件**，**事件监听器**三类对象组成 处理流程如下: 
+
+1. **Step 1:**为某个事件源(组件)设置一个监听器,用于监听用户操作 
+2. **Step 2:**用户的操作,触发了事件源的监听器 
+3. **Step 3:**生成了对应的事件对象 
+4. **Step 4:**将这个事件源对象作为参数传给事件监听器 
+5. **step 5:**事件监听器对事件对象进行判断,执行对应的事件处理器(对应事件的处理方法)
+
+事件监听机制是一种委派式的事件处理机制,事件源(组件)事件处理委托给事件监听器 当事件源发生指定事件时,就通知指定事件监听器,执行相应的操作。
+
+#### 五种使用形式
+
+1. 直接用匿名内部类: 平时最常用的一种:直接setXxxListener后,重写里面的方法即可; 通常是临时使用一次,复用性不高。
+
+   ```java
+   btnshow = (Button) findViewById(R.id.btnshow);    
+           btnshow.setOnClickListener(new OnClickListener() {    
+               //重写点击事件的处理方法onClick()    
+               @Override    
+               public void onClick(View v) {    
+                   //显示Toast信息    
+                   Toast.makeText(getApplicationContext(), "你点击了按钮", Toast.LENGTH_SHORT).show();    
+               }
+           });
+   ```
+
+2. 使用内部类: 和上面的匿名内部类不同哦！ 使用优点:可以在该类中进行复用,可直接访问外部类的所有界面组件。
+
+   ```java
+   class BtnClickListener implements View.OnClickListener    
+       {    
+           @Override    
+           public void onClick(View v) {    
+               Toast.makeText(getApplicationContext(), "按钮被点击了", Toast.LENGTH_SHORT).show();   
+           }    
+       }
+   btnshow.setOnClickListener(new BtnClickListener());
+   ```
+
+3. 使用外部类：就是另外创建一个处理事件的Java文件,这种形式用的比较少！因为外部类不能直接访问用户界面 类中的组件,要通过构造方法将组件传入使用;这样导致的结果就是代码不够简洁！
+
+4. 直接使用Activity作为事件监听器: 只需要让Activity类实现XxxListener事件监听接口,在Activity中定义重写对应的事件处理器方法 eg:Actitity实现了OnClickListener接口,重写了onClick(view)方法在为某些组建添加该事件监听对象 时,直接setXxx.Listener(this)即可。
+
+   ```java
+   //让Activity方法实现OnClickListener接口    
+   public class MainActivity extends Activity implements OnClickListener{
+   //重写接口中的抽象方法    
+       @Override    
+       public void onClick(View v) {  }
+       btnshow.setOnClickListener(this);// 直接调用this即可
+   }
+   ```
+
+5. 直接绑定到标签: 就是直接在xml布局文件中对应得Activity中定义一个事件处理方法 eg:public void myClick(View source) source对应事件源(组件) 接着布局文件中对应要触发事件的组建,设置一个属性:onclick = "myclick"即可
+
+   ```java
+   // xml中
+   <Button android:onClick="myclick"/>   
+
+   //自定义一个方法,传入一个view组件作为参数    
+       public void myclick(View source)    
+       {    
+           ...  
+       }
+   ```
+
+
+
 ### 1.2 基于回调的事件处理机制
+
+什么是方法回调?
+
+答:是将功能定义与功能分开的一种手段,一种解耦合的设计思想;在Java中回调是通过接口来实现的, 作为一种系统架构,必须要有自己的运行环境,且需要为用户提供实现接口;实现依赖于客户,这样就可以达到接口统一,实现不同,系统通过在不同的状态下"回调"我们的实现类,从而达到接口和实现的分离！
+
+#### 1.2.1 使用场景
+
+自定义View
+
+当用户在GUI组件上激发某个事件时,组件有自己特定的方法会负责处理该事件 通常用法:继承基本的GUI组件,重写该组件的事件处理方法,即自定义view 注意:在xml布局中使用自定义的view时,需要使用**全限定类名**
+
+android为GUI组件提供了一些事件处理的回调方法,以View为例,有以下几个方法：
+
+* 在该组件上触发屏幕事件: boolean onTouchEvent(MotionEvent event);
+* 在该组件上按下某个按钮时: boolean onKeyDown(int keyCode,KeyEvent event);
+* 松开组件上的某个按钮时: boolean onKeyUp(int keyCode,KeyEvent event);
+* 长按组件某个按钮时: boolean onKeyLongPress(int keyCode,KeyEvent event);
+* 键盘快捷键事件发生: boolean onKeyShortcut(int keyCode,KeyEvent event);
+* 在组件上触发轨迹球屏事件: boolean onTrackballEvent(MotionEvent event);
+* 当组件的焦点发生改变,和前面的6个不同,这个方法只能够在View中重写哦！ protected void onFocusChanged(boolean gainFocus, int direction, Rect previously FocusedRect)
+
+一个简单的按钮,点击按钮后触发onTouchEvent事件,当我们按模拟器上的键盘时, 按下触发onKeyDown,离开键盘时触发onKeyUp事件。
+
+```java
+public class MyButton extends Button{  
+    private static String TAG = "呵呵";  
+    public MyButton(Context context, AttributeSet attrs) {  
+        super(context, attrs);  
+    }  
+  
+    //重写键盘按下触发的事件  
+    @Override  
+    public boolean onKeyDown(int keyCode, KeyEvent event) {  
+        super.onKeyDown(keyCode,event);  
+        Log.i(TAG, "onKeyDown方法被调用");  
+        return true;  
+    }  
+  
+    //重写弹起键盘触发的事件  
+    @Override  
+    public boolean onKeyUp(int keyCode, KeyEvent event) {  
+        super.onKeyUp(keyCode,event);  
+        Log.i(TAG,"onKeyUp方法被调用");  
+        return true;  
+    }  
+  
+    //组件被触摸了  
+    @Override  
+    public boolean onTouchEvent(MotionEvent event) {  
+        super.onTouchEvent(event);  
+        Log.i(TAG,"onTouchEvent方法被调用");  
+        return true;  
+    }  
+} 
+```
+
+布局文件：
+
+```xml
+<example.jay.com.mybutton.MyButton  />
+```
+
+#### 1.2.2 基于回调的事件传播
+
+![](http://www.runoob.com/wp-content/uploads/2015/07/9989678.jpg)
+
+倘若为false，表示事件未处理完，会继续传播，无论是Listener还是回调方法都是。
+
+传播顺序：**监听器**--->**view组件的回调方法**--->**Activity的回调方法**
 
 ### 1.3 Handler消息传递机制
 
