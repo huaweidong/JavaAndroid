@@ -903,9 +903,334 @@ Android 利用远程过程调用 (RPC) 提供了一种进程间通信 (IPC) 机�
 
 ### 9.1 File
 
+#### 9.1.1 Android文件的操作模式
+
+![img](img/17587054.png)
+
+#### 9.1.2 操作方法
+
+![img](img/95941036.png)
+
+
+
+@+id 新增一个资源id
+@id和android:id，引用现有的资源id
+
+```java
+public void Save(String filename, String filecontent) throws Exception {
+        // 保存到文件的方法
+        FileOutputStream output = mContext.openFileOutput(filename, Context.MODE_PRIVATE);
+        output.write(filecontent.getBytes());
+        output.close();
+    }
+
+    public String Read(String filename) throws Exception {
+        FileInputStream input = mContext.openFileInput(filename);
+        byte[] temp = new byte[1024];
+        StringBuilder sb = new StringBuilder("");
+        int len = 0;
+        while( (len = input.read(temp)) > 0) {
+            sb.append(new String(temp, 0, len));
+        }
+        input.close();
+        return sb.toString();
+    }
+```
+
+```java
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {	// 回调方法
+  
+  public void onCreate(Bundle savedInstanceState) {
+    btnclear.setOnClickListener(this);
+    ...
+  }
+  public void onClick(View v) {
+    switch (v.getId()) {
+      case R.id.btnclear:
+      ...
+    }
+  }
+}
+```
+
+#### 读取SD卡上的文件
+
+![img](img/61882958.png)
+
+```java
+// 写入
+// 如果手机已插入sd卡,且app具有读写sd卡的权限
+        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            filename = Environment.getExternalStorageDirectory().getCanonicalPath() + "/" + filename;
+            //这里就不要用openFileOutput了,那个是往手机内存中写数据的
+            FileOutputStream output = new FileOutputStream(filename);
+            output.write(filecontent.getBytes());
+            //将String字符串以字节流的形式写入到输出流中
+            output.close();
+            //关闭输出流
+        } else 
+          Toast.makeText(context, "SD卡不存在或者不可读写", Toast.LENGTH_SHORT).show();
+
+// 读取
+StringBuilder sb = new StringBuilder("");
+        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            filename = Environment.getExternalStorageDirectory().getCanonicalPath() + "/" + filename;
+            //打开文件输入流
+            FileInputStream input = new FileInputStream(filename);
+            byte[] temp = new byte[1024];
+
+            int len = 0;
+            //读取文件内容:
+            while ((len = input.read(temp)) > 0) {
+                sb.append(new String(temp, 0, len));
+            }
+            //关闭输入流
+            input.close();
+        }
+```
+
+```xml
+<!-- 在SDCard中创建与删除文件权限 -->
+<uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"/>
+<!-- 往SDCard写入数据权限 -->
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+```
+
+#### 读取raw和assets文件夹下的文件
+
+1. res/raw：文件会被映射到R.java文件中，访问的时候直接通过资源ID即可访问，而且 他不能有目录结构，就是不能再创建文件夹
+
+   ```java
+   InputStream is =getResources().openRawResource(R.raw.filename); 
+   ```
+
+2. assets：不会映射到R.java文件中，通过AssetManager来访问，能有目录结构，即， 可以自行创建文件夹
+
+   ```java
+   AssetManager am =  getAssets();  
+   InputStream is = am.open("filename");
+   ```
+
+
+
 ### 9.2 SharedPreferences
 
+使用SharedPreferences(保存用户偏好参数)保存数据。SharedPreferences也是使用xml文件, 然后类似于Map集合,使用键-值的形式来存储数据;我们只需要调用SharedPreferences的getXxx(name), 就可以根据键获得对应的值！
+
+#### 9.2.1 使用示例
+
+![img](img/77015718.png)
+
+
+
+点击登录按钮时，执行保存；onStart()时读取，保证打开界面时能够显示用户名和密码。
+
+#### 9.2.2 读取其他应用的SharedPreferences
+
+>核心： 获得其他app的Context,而这个Context代表访问该app的全局信息的接口,而决定应用的唯一标识 是应用的包名,所以我们可以通过应用包名获得对应app的Context 另外有一点要注意的是：其他应用的SP文件是否能被读写的前提就是SP文件是否指定了可读或者 可写的权限，我们上面创建的是MODE_PRIVATE的就不可以了~所以说你想读别人的SP里的数据，很难。
+
+![img](img/54316471.png)
+
+```java
+//获得第一个应用的包名,从而获得对应的Context,需要对异常进行捕获
+                try {
+                    othercontext = createPackageContext("com.jay.sharedpreferencedemo", Context.CONTEXT_IGNORE_SECURITY);
+                } catch (PackageManager.NameNotFoundException e) {
+                    e.printStackTrace();
+                }
+                //根据Context取得对应的SharedPreferences
+                sp = othercontext.getSharedPreferences("mysp", Context.MODE_WORLD_READABLE);
+                String name = sp.getString("username", "");
+                String passwd = sp.getString("passwd", "");
+```
+
+#### 9.2.3 对SharedPreference的重要数据进行加密
+
+![img](img/86646661.png)
+
+
+
+
+
+
+
 ### 9.3 SQLite
+
+> SQLite是一个轻量级的关系型数据库，运算速度快，占用资源少，很适合在移动设备上使用， 不仅支持标准SQL语法，还遵循ACID(数据库事务)原则，无需账号，使用起来非常方便！
+>
+> SQLite支持**五种数据类型**:NULL,INTEGER,REAL(浮点数),TEXT(字符串文本)和BLOB(二进制对象) 虽然只有五种,但是对于varchar,char等其他数据类型都是可以保存的;因为SQLite有个最大的特点: **你可以各种数据类型的数据保存到任何字段中而不用关心字段声明的数据类型**是什么，比如你 可以在Integer类型的字段中存放字符串,当然**除了声明为主键INTEGER PRIMARY KEY的字段只能够存储64位整数**！ 
+>
+> SQlite通过**文件**来保存数据库，一个文件就是一个**数据库**，数据库中又包含多个**表格**，表格里又有 多条**记录**，每个记录由多个**字段**构成，每个字段有对应的**值**，每个值我们可以指定**类型**，也可以不指定 类型(主键除外)
+
+相关类：
+
+- **SQLiteOpenHelper**：抽象类，我们通过继承该类，然后重写数据库创建以及更新的方法， 我们还可以通过该类的对象获得数据库实例，或者关闭数据库！
+- **SQLiteDatabase**：数据库访问类：我们可以通过该类的对象来对数据库做一些增删改查的操作
+- **Cursor**：游标，有点类似于JDBC里的resultset，结果集！可以简单理解为指向数据库中某 一个记录的指针！
+
+#### 9.3.1 SQLiteOpenHelper
+
+> 对于涉及数据库的app,我们不可能手动地去给他创建数据库文件,所以需要在第一次启用app 的时候就创建好数据库表;而当我们的应用进行升级需要修改数据库表的结构时,这个时候就需要 对数据库表进行更新了;对于这两个操作,安卓给我们提供了**SQLiteOpenHelper**的两个方法, **onCreate**( )**与onUpgrade**( )来实现
+
+* **onCreate(database)**: 首次使用软件时生成数据库表
+* **onUpgrade(database,oldVersion,newVersion)**: 在数据库的版本发生变化时会被调用， 一般在软件升级时才需改变版本号，而数据库的版本是由程序员控制的，假设数据库现在的 版本是1，由于业务的变更，修改了数据库表结构，这时候就需要升级软件，升级软件时希望 更新用户手机里的数据库表结构，为了实现这一目的，可以把原来的数据库版本设置为2 
+
+```java
+public class MyDBOpenHelper extends SQLiteOpenHelper {
+    public MyDBOpenHelper(Context context, String name, CursorFactory factory,
+            int version) {super(context, "my.db", null, 1); }
+    @Override
+    //数据库第一次创建时被调用
+    public void onCreate(SQLiteDatabase db) {
+        db.execSQL("CREATE TABLE person(personid INTEGER PRIMARY KEY AUTOINCREMENT,name VARCHAR(20))");
+        
+    }
+    //软件版本号发生改变时调用
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("ALTER TABLE person ADD phone VARCHAR(12) NULL");
+    }
+}
+```
+
+上述代码第一次启动应用，我们会创建这个my.db的文件，并且会执行onCreate()里的方法， 创建一个Person的表，他又两个字段，主键personId和name字段；接着如我我们修改db的版本 号，那么下次启动就会调用onUpgrade()里的方法，往表中再插入一个字段！
+
+当我们调用上面的MyDBOpenhelper的对象的getWritableDatabase()就会在下述目录下创建我们的db 数据库文件
+
+![img](img/76327470.png)
+
+```
+onCreate() {
+	...
+	myDBHelper = new MyDBOpenHelper(mContext, "my.db", null, 1);
+}
+```
+
+#### 9.3.2 SQLite增删查改
+
+```java
+// 增
+ContentValues values1 = new ContentValues();
+                values1.put("name", "呵呵~" + i);
+                i++;
+                //参数依次是：表名，强行插入null值得数据列的列名，一行记录的数据
+                db.insert("person", null, values1);
+
+// 查
+Cursor cursor = db.query("person", null, null, null, null, null, null);
+if (cursor.moveToFirst()) {
+  do {
+    int pid = cursor.getInt(cursor.getColumnIndex("personid"));
+    String name = cursor.getString(cursor.getColumnIndex("name"));
+  } while (cursor.moveToNext()); // 遍历所有结果
+}
+cursor.close();
+
+// 改
+ContentValues values2 = new ContentValues();
+values2.put("name", "嘻嘻~");
+//参数依次是表名，修改后的值，where条件，以及约束，如果不指定三四两个参数，会更改所有行
+db.update("person", values2, "name = ?", new String[]{"呵呵~2"});
+                
+// 删
+db.delete("person", "personid = ?", new String[]{"3"});
+```
+
+增删改所使用的db都需要是getWritableDatabase(), 而查询只需要getReadableDatabase()
+
+#### 9.3.3 使用SQL语句操作数据库
+
+- **execSQL**(SQL,Object[]):使用带占位符的SQL语句,这个是执行修改数据库内容的sql语句用的
+- **rawQuery**(SQL,Object[]):使用带占位符的SQL查询操作 另外前面忘了介绍下Curosr这个东西以及相关属性，这里补充下： ——**Cursor**对象有点类似于JDBC中的ResultSet,结果集!使用差不多,提供一下方法移动查询结果的记录指针:
+- **move**(offset):指定向上或者向下移动的行数,整数表示向下移动;负数表示向上移动！
+- **moveToFirst**():指针移动到第一行,成功返回true,也说明有数据
+- **moveToLast**():指针移动到最后一样,成功返回true;
+- **moveToNext**():指针移动到下一行,成功返回true,表明还有元素！
+- **moveToPrevious**():移动到上一条记录
+- **getCount**( )获得总得数据条数
+- **isFirst**():是否为第一条记录
+- **isLast**():是否为最后一项
+- **moveToPosition**(int):移动到指定行
+
+```java
+SQLiteDatabase db = dbOpenHelper.getWritableDatabase();
+
+// 插入
+db.execSQL("INSERT INTO person(name, phone) values(?,?)", new String[]{p.getName(), p.getPhone()});
+// 删除
+db.execSQL("DELETE FROM person WHERE personid = ?", new String[]{id});
+// 修改
+db.execSQL("UPDATE person SET name = ?, phone = ? WHERE personid = ?", new String[]{p.getName(), p.getPhone(), p.getId()});
+
+SQLiteDatabase db = dbOpenHelper.getReadabeDatabase();
+// 查询
+Cursor cursor = db.rawQuery("SELECT * FROM person WHERE personid = ?", new String[]{id.getString()});
+if(cursor.moveToFirst()) { // 存在数据才返回true
+	int personid = cursor.getInt(cursor.getColumnIndex("personid"));
+	String name = cursor.getString(cursor.getColumnIndex("name"));
+	String phone = cursor.getString(cursor.getColumnIndex("phone"));
+}
+cursor.close();
+// 查询记录数方法一
+Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM person",null);
+cursor.moveToFirst();
+long result = cursor.getLong(0);
+// 查询记录数方法二
+Cursor cursor = db.rawQuery("SELECT * FROM person",null);
+long result = cursor.getCount();
+
+```
+
+
+
+#### 9.3.4 SQLite事务
+
+![img](img/29572776.png)
+
+写在事务里的所有数据库操作都成功，事务提交，否则，事务回滚。
+
+
+
+#### 9.3.5 SQLite存储大二进制文件
+
+一般我们很少往数据库中存储大二进制文件，比如图片，音频，视频等，对于这些我们一般是存储文件路径，但总会有些奇葩的需求，某天你突然想把这些文件存到数据库里，可以通过如下方法来实现。
+
+![img](img/83617087.png)
+
+
+
+#### 9.3.6 SimpleCursorAdapter绑定数据库数据
+
+![img](img/21347521.png)
+
+#### 9.3.7 数据库升级
+
+假如我们已经升级到第三个版本了，我们在第二个版本增加了一个表， 然后第三个版本也增加了一个表，加入用户直接从第一个版本升级到第三个版本，这样 没经过第二个版本，就没有增加的那个表，这可怎么破？
+
+```java
+public void onUpgrade(SQLiteDatabase db, ConnectionSource connectionSource,
+            int arg2, int arg3) {
+    switch(arg2){
+        case 1:
+            db.execSQL(第一个版本的建表语句);
+        case 2:
+            db.execSQL(第二个版本的建表语句);
+        case 3:
+            db.execSQL(第三个版本的建表语句); 
+    }
+}
+```
+
+旧表的设计太糟糕，很多字段要改，改动太多，想建一个新表，但是表名要一样 而且以前的一些数据要保存到新表中！
+
+思路：
+
+1. 将旧表改名成临时表: **ALTER TABLE User RENAME TO _temp_User;*
+2. 创建新表: **CREATE TABLE User (u_id INTEGER PRIMARY KEY,u_name VARCHAR(20),u_age VARCHAR(4));**
+3. 导入数据； **INSERT INTO User SELECT u_id,u_name,"18" FROM _temp_User;** //原表中没有的要自己设个默认值
+4. 删除临时表； **DROP TABLE_temp_User;**
+
+
 
 ## 10. 网络编程
 
