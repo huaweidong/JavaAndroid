@@ -818,21 +818,34 @@ Intent 对象携带了 Android 系统用来确定要启动哪个组件的信息�
 
 1. 组件名称：显示启动必备
 
+   ![img](img/93994466.png)
+
 2. 操作：指定要执行的通用操作（例如，“查看”或“选取”）的字符串。如ACTION_VIEW/ACTION_SEND，可以使用 `setAction()` 或 `Intent` 构造函数为 Intent 指定操作。如果定义自己的操作，请确保将应用的软件包名称作为前缀
 
    ```java
    static final String ACTION_TIMETRAVEL = "com.example.action.TIMETRAVEL";
    ```
 
-3. 数据：引用待操作数据和/或该数据 MIME 类型的 URI（`Uri` 对象）。 `setData()` 和 `setType()`和`setDataAndType()`
+   ![img](img/10976710.png)
+
+3. 数据：引用待操作数据Data或 MIME 类型的 URI。 `setData()` 和 `setType()`和`setDataAndType()`
+
+   ![此处输入图片的描述](img/13299674.png)
 
 4. 类别：一个包含应处理 Intent 组件类型的附加信息的字符串。 
+
+   ![img](img/97975471.png)
 
 
 以上列出的这些属性（组件名称、操作、数据和类别）表示 Intent 的既定特征。 通过读取这些属性，Android 系统能够解析应当启动哪个应用组件。Intent 也有可能会一些携带不影响其如何解析为应用组件的信息。
 
 5. Extra：携带完成请求操作所需的附加信息的键值对。`putExtra()`添加extra数据，或创建Bundle对象，使用`putExtras()`将其插入Intent中
+
+   ![img](img/19949418.png)
+
 6. 标志：在 `Intent` 类中定义的、充当 Intent 元数据的标志。
+
+   ![img](img/65852896.png)
 
 ### 6.2 显式 Intent 示例
 
@@ -844,9 +857,23 @@ downloadIntent.setData(Uri.parse(fileUrl));
 startService(downloadIntent);
 ```
 
+```java
+// 点击按钮返回Home界面
+Intent it = new Intent();
+it.setAction(Intent.ACTION_MAIN);
+it.addCategory(Intent.CATEGORY_HOME);
+startActivity(it);
+
+// 打开百度页面
+Intent it = new Intent();
+it.setAction(Intent.ACTION_VIEW);
+it.setData(Uri.parse("http://www.baidu.com"));
+StartAvtivity(it);
+```
+
 ### 6.3  隐式 Intent 示例
 
-隐式 Intent 指定能够在可以执行相应操作的设备上调用任何应用的操作。 
+![img](img/96004503.png)
 
 用户可能没有任何应用处理您发送到 startActivity() 的隐式 Intent。如果出现这种情况，则调用将会失败，且应用会崩溃。要验证 Activity 是否会接收 Intent，请对 Intent 对象调用 resolveActivity()。如果结果为非空，则至少有一个应用能够处理该 Intent，且可以安全调用 startActivity()。 如果结果为空，则不应使用该 Intent。如有可能，您应停用发出该 Intent 的功能。
 
@@ -863,6 +890,53 @@ sendIntent.setType("text/plain");
 if (sendIntent.resolveActivity(getPackageManager()) != null) {
     startActivity(sendIntent);
 }
+```
+
+示例1：点击按钮后,所有Action为VIEW的Activity被筛选出来,由用户进一步选择
+
+第一个Activity调用
+
+```java
+Intent it = new Intent();
+it.setAction(Intent.ACTION_VIEW);
+startActivity(it);
+```
+
+第二个Activity的intent filter
+
+```xml
+
+<activity android:name=".SecondActivity"
+            android:label="第二个Activity">
+    <intent-filter>
+        <action android:name="android.intent.action.VIEW"/>
+        <category android:name="android.intent.category.DEFAULT"/>
+    </intent-filter>           
+ </activity>
+```
+
+示例2：自定义动作的隐式示例，使用自定义的Action与category来激活另一个Activity
+
+第一个Activity调用
+
+```java
+Intent it = new Intent();
+it.setAction("my_action");
+it.addCategory("my_category");
+startActivity(it);
+```
+
+第二个Activity的intent filter
+
+```xml
+<activity android:name=".SecondActivity"
+        android:label="第二个Activity">
+    <intent-filter>
+        <action android:name="my_action"/>
+        <category android:name="my_category"/>
+        <category android:name="android.intent.category.DEFAULT"/>
+    </intent-filter>           
+</activity>
 ```
 
 ### 6.4 强制使用应用选择器
@@ -977,6 +1051,108 @@ if (sendIntent.resolveActivity(getPackageManager()) != null) {
 
 `PackageManager` 提供了一整套 `query...()` 方法来返回所有能够接受特定 Intent 的组件。此外，它还提供了一系列类似的 `resolve...()` 方法来确定响应 Intent 的最佳组件。 例如，`queryIntentActivities()` 将返回能够执行那些作为参数传递的 Intent 的所有 Activity 列表，而 `queryIntentServices()` 则可返回类似的服务列表。这两种方法均不会激活组件，而只是列出能够响应的组件。 对于广播接收器，有一种类似的方法： `queryBroadcastReceivers()`。
 
+### 6.9 Intent传数据的方法
+
+#### 6.9.1 简单数据
+
+![img](img/71858311.png)
+
+#### 6.9.2 传递数组
+
+```java
+bd.putStringArray("StringArray", new String[]{"呵呵","哈哈"});
+//可把StringArray换成其他数据类型,比如int,float等等...
+
+String[] str = bd.getStringArray("StringArray");
+```
+
+#### 6.9.3 传递集合
+
+* List<基本数据类型或String>
+
+  ```java
+  intent.putStringArrayListExtra(name, value)
+  intent.putIntegerArrayListExtra(name, value)
+
+  intent.getStringArrayListExtra(name)
+  intent.getIntegerArrayListExtra(name)
+  ```
+
+* List<Object>: 将list强转成Serializable类型，Object类需要实现Serializable接口
+
+  ```java
+  putExtras(key, (Serializable)list)
+
+  (List<Object>) getIntent().getSerializable(key)
+  ```
+
+* Map<String, Object>, 或更复杂的：外层套个List
+
+  ```java
+  //传递复杂些的参数 
+  Map<String, Object> map1 = new HashMap<String, Object>();  
+  map1.put("key1", "value1");  
+  map1.put("key2", "value2");  
+  List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();  
+  list.add(map1);  
+
+  Intent intent = new Intent();  
+  intent.setClass(MainActivity.this,ComplexActivity.class);  
+  Bundle bundle = new Bundle();  
+
+  //须定义一个list用于在budnle中传递需要传递的ArrayList<Object>,这个是必须要的  
+  ArrayList bundlelist = new ArrayList();   
+  bundlelist.add(list);   
+  bundle.putParcelableArrayList("list",bundlelist);  
+  intent.putExtras(bundle);                
+  startActivity(intent); 
+  ```
+
+#### 6.9.4 传递对象
+
+传递对象的方式有两种：将对象转换为Json字符串或者通过Serializable,Parcelable序列化。
+
+1. Json
+
+   ```java
+   Book book=new Book();
+   intent.putExtra("book", new Gson().toJson(book));
+
+   String bookJson = getIntent().getStringExtra("book");
+   Book book = new Gson().fromJson(bookJson, Book.class);
+   ```
+
+2. Serializable
+
+   ①业务Bean实现：Serializable接口,写上getter和setter方法
+   ②Intent通过调用putExtra(String name, Serializable value)传入对象实例 当然对象有多个的话多个的话,我们也可以先Bundle.putSerializable(x,x);
+   ③新Activity调用getSerializableExtra()方法获得对象实例: eg:Product pd = (Product) getIntent().getSerializableExtra("Product");
+   ④调用对象get方法获得相应参数
+
+3. Parcelable
+
+   ①业务Bean继承Parcelable接口,重写writeToParcel方法,将你的对象序列化为一个Parcel对象;
+   ②重写describeContents方法，内容接口描述，默认返回0就可以
+   ③实例化静态内部对象CREATOR实现接口Parcelable.Creator
+   ④同样式通过Intent的putExtra()方法传入对象实例,当然多个对象的话,我们可以先 放到Bundle里Bundle.putParcelable(x,x),再Intent.putExtras()即可
+
+>  两者的比较:
+>
+> 1）在使用内存的时候，Parcelable比Serializable性能高，所以推荐使用Parcelable。
+>
+> 2）Serializable在序列化的时候会产生大量的临时变量，从而引起频繁的GC。
+>
+> 3）Parcelable不能使用在要将数据存储在磁盘上的情况，因为Parcelable不能很好的保证数据的 持续性在外界有变化的情况下。尽管Serializable效率低点，但此时还是建议使用Serializable。
+
+#### 6.9.5 Bitmap
+
+bitmap默认实现Parcelable接口，直接传递即可。
+
+#### 6.9.6 传来传去不方便，直接定义全局数据
+
+Android系统在每个程序运行的时候创建一个Application对象，而且只会创建一个，所以Application 是单例(singleton)模式的一个类，而且Application对象的生命周期是整个程序中最长的，他的生命 周期等于这个程序的生命周期。如果想存储一些比静态的值(固定不改变的，也可以变)。
+
+如果你想使用 Application就需要自定义类实现Application类，并且告诉系统实例化的是我们自定义的Application 而非系统默认的，而这一步，就是在AndroidManifest.xml中卫我们的application标签添加:name属性；之后就可以使用`(MyApp)getApplicationContext()`获取该实例了。
 
 
 
