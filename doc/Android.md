@@ -10,7 +10,7 @@
 * 优化的图形库,多媒体支持,GSM电话技术,蓝牙等
 * 采用软件叠层方式构建
 
-![framework](img/16510882.jpg)
+![img](img/android-stack_2x.png)
 
 Libraries(库) + Android Runtime(Android运行时) Android给我们提供了一组C/C++库，为平台的不同组件所使用，比如媒体框架；而Android Runtime则由Android核心库集 + Dalvik虚拟机构成，Dalvik虚拟机是针对移动设备的虚拟机，它的特点:不需要很快的CPU计算速度和大量的内存空间;而每个App都单独地运行在单独的Dalvik虚拟机内每个app对于一条Dalvik进程）
 

@@ -649,15 +649,15 @@ private void getContacts(){
 >
 > 其实BroadcastReceiver就是应用程序间的全局大喇叭，即通信的一个手段， 系统自己在很多时候都会发送广播，比如电量低或者充足，刚启动完，插入耳机，输入法改变等， 发生这些时间，系统都会发送广播，这个叫系统广播，每个APP都会收到，如果你想让你的应用在接收到 这个广播的时候做一些操作，比如：系统开机后，偷偷后台跑服务~哈哈，这个时候你只需要为你的应用 注册一个用于监视开机的BroadcastReceiver，当接收到开机广播就做写偷偷摸摸的勾当~ 当然我们也可以自己发广播，比如：接到服务端推送信息，用户在别处登录，然后应该强制用户下线回到 登陆界面，并提示在别处登录……
 
-![img](http://www.runoob.com/wp-content/uploads/2015/08/72916726.jpg)
+![img](img/72916726.png)
 
 ### 5.1 接收广播
 
 接收广播需要给程序注册注册广播，有两种注册广播的方式：
 
-![img](http://www.runoob.com/wp-content/uploads/2015/08/17322218.jpg)
+![img](img/17322218.png)
 
-![img](http://www.runoob.com/wp-content/uploads/2015/08/93737904.jpg)
+![img](img/93737904.png)
 
 动态注册示例（网络变化）
 
@@ -729,15 +729,15 @@ public class BootCompleteReceiver extends BroadcastReceiver {
 
 ### 5.2 发送广播
 
-![img](http://www.runoob.com/wp-content/uploads/2015/08/47229905.jpg)
+![img](img/47229905.png)
 
 ### 5.3 本地广播
 
 前面写的广播都是全局广播！这同样意味着我们APP发出的广播，其他APP都会接收到， 或者其他APP发送的广播，我们的APP也同样会接收到，这样容易引起一些安全性的问题！而 Android中给我们提供了本地广播的机制，使用该机制发出的广播只会在APP内部传播，而且 广播接收者也只能收到本应用发出的广播！
 
-![img](http://www.runoob.com/wp-content/uploads/2015/08/96168525.jpg)
+![img](img/96168525.png)
 
-![img](http://www.runoob.com/wp-content/uploads/2015/08/59582423.jpg)
+![img](img/59582423.png)
 
 示例：别处登陆踢用户下线
 
@@ -794,6 +794,189 @@ public class MainActivity extends BaseActivity {
 
 
 ## 6. Intent
+
+`Intent` 是一个消息传递对象，其基本用例主要包括以下三个
+
+1. 启动 Activity： `startActivity()`或 `startActivityForResult()`
+2. 启动服务：`startService()`或`bindService()`
+3. 传递广播：通过将 Intent 传递给 sendBroadcast()、sendOrderedBroadcast() 或 sendStickyBroadcast()，您可以将广播传递给其他应用。
+
+两种类型：
+
+1. **显式 Intent**：按名称（完全限定类名）指定要启动的组件。 通常，您会在自己的应用中使用显式 Intent 来启动组件，这是因为您知道要启动的 Activity 或服务的类名。创建显式 Intent 启动 Activity 或服务时，系统将立即启动 `Intent` 对象中指定的应用组件。
+2. **隐式 Intent **：不会指定特定的组件，而是声明要执行的常规操作，从而允许其他应用中的组件来处理它。 创建隐式 Intent 时，Android 系统通过将 Intent 的内容与在设备上其他应用的[清单文件](https://developer.android.google.cn/guide/topics/manifest/manifest-intro.html)中声明的 Intent 过滤器进行比较，从而找到要启动的相应组件。如果 Intent 与 Intent 过滤器匹配，则系统将启动该组件，并向其传递 `Intent` 对象。 如果多个 Intent 过滤器兼容，则系统会显示一个对话框，支持用户选取要使用的应用。
+
+![img](img/intent-filters@2x.png)
+
+> Intent 过滤器是应用清单文件中的一个表达式，它指定该组件要接收的 Intent 类型。 例如，通过为 Activity 声明 Intent 过滤器，您可以使其他应用能够直接使用某一特定类型的 Intent 启动 Activity。同样，如果您没有为 Activity 声明任何 Intent 过滤器，则 Activity 只能通过显式 Intent 启动。
+>
+> 为了确保应用的安全性，启动 `Service` 时，请始终使用显式 Intent，且不要为服务声明 Intent 过滤器。使用隐式 Intent 启动服务存在安全隐患，因为您无法确定哪些服务将响应 Intent，且用户无法看到哪些服务已启动。
+
+### 6.1 构建 Intent
+
+Intent 对象携带了 Android 系统用来确定要启动哪个组件的信息（例如，准确的组件名称或应当接收该 Intent 的组件类别），以及收件人组件为了正确执行操作而使用的信息（例如，要采取的操作以及要处理的数据）。
+
+1. 组件名称：显示启动必备
+
+2. 操作：指定要执行的通用操作（例如，“查看”或“选取”）的字符串。如ACTION_VIEW/ACTION_SEND，可以使用 `setAction()` 或 `Intent` 构造函数为 Intent 指定操作。如果定义自己的操作，请确保将应用的软件包名称作为前缀
+
+   ```java
+   static final String ACTION_TIMETRAVEL = "com.example.action.TIMETRAVEL";
+   ```
+
+3. 数据：引用待操作数据和/或该数据 MIME 类型的 URI（`Uri` 对象）。 `setData()` 和 `setType()`和`setDataAndType()`
+
+4. 类别：一个包含应处理 Intent 组件类型的附加信息的字符串。 
+
+
+以上列出的这些属性（组件名称、操作、数据和类别）表示 Intent 的既定特征。 通过读取这些属性，Android 系统能够解析应当启动哪个应用组件。Intent 也有可能会一些携带不影响其如何解析为应用组件的信息。
+
+5. Extra：携带完成请求操作所需的附加信息的键值对。`putExtra()`添加extra数据，或创建Bundle对象，使用`putExtras()`将其插入Intent中
+6. 标志：在 `Intent` 类中定义的、充当 Intent 元数据的标志。
+
+### 6.2 显式 Intent 示例
+
+```java
+// Executed in an Activity, so 'this' is the Context
+// The fileUrl is a string URL, such as "http://www.example.com/image.png"
+Intent downloadIntent = new Intent(this, DownloadService.class);
+downloadIntent.setData(Uri.parse(fileUrl));
+startService(downloadIntent);
+```
+
+### 6.3  隐式 Intent 示例
+
+隐式 Intent 指定能够在可以执行相应操作的设备上调用任何应用的操作。 
+
+用户可能没有任何应用处理您发送到 startActivity() 的隐式 Intent。如果出现这种情况，则调用将会失败，且应用会崩溃。要验证 Activity 是否会接收 Intent，请对 Intent 对象调用 resolveActivity()。如果结果为非空，则至少有一个应用能够处理该 Intent，且可以安全调用 startActivity()。 如果结果为空，则不应使用该 Intent。如有可能，您应停用发出该 Intent 的功能。
+
+调用 `startActivity()` 时，系统将检查已安装的所有应用，确定哪些应用能够处理这种 Intent（即：含 `ACTION_SEND` 操作并携带“text/plain”数据的 Intent ）。 如果只有一个应用能够处理，则该应用将立即打开并为其提供 Intent。 如果多个 Activity 接受 Intent，则系统将显示一个对话框，使用户能够选取要使用的应用。
+
+```java
+// Create the text message with a string
+Intent sendIntent = new Intent();
+sendIntent.setAction(Intent.ACTION_SEND);
+sendIntent.putExtra(Intent.EXTRA_TEXT, textMessage);
+sendIntent.setType("text/plain");
+
+// Verify that the intent will resolve to an activity
+if (sendIntent.resolveActivity(getPackageManager()) != null) {
+    startActivity(sendIntent);
+}
+```
+
+### 6.4 强制使用应用选择器
+
+```java
+Intent sendIntent = new Intent(Intent.ACTION_SEND);
+...
+
+// Always use string resources for UI text.
+// This says something like "Share this photo with"
+String title = getResources().getString(R.string.chooser_title);
+// Create intent to show the chooser dialog
+Intent chooser = Intent.createChooser(sendIntent, title);
+
+// Verify the original intent will resolve to at least one activity
+if (sendIntent.resolveActivity(getPackageManager()) != null) {
+    startActivity(chooser);
+}
+```
+
+### 6.5 接收隐式 Intent
+
+要公布应用可以接收哪些隐式 Intent，请在清单文件中使用 <intent-filter> 元素为每个应用组件声明一个或多个 Intent 过滤器。每个 Intent 过滤器均根据 Intent 的操作、数据和类别指定自身接受的 Intent 类型。 
+
+> 显式 Intent 始终会传递给其目标，无论组件声明的 Intent 过滤器如何均是如此。
+
+```xml
+<activity android:name="ShareActivity">
+    <intent-filter>
+        <action android:name="android.intent.action.SEND"/>
+        <category android:name="android.intent.category.DEFAULT"/>
+        <data android:mimeType="text/plain"/>
+    </intent-filter>
+</activity>
+```
+
+可以创建一个包括多个 <action>、<data> 或 <category> 实例的过滤器。如需仅以操作、数据和类别类型的特定组合来处理多种 Intent，则需创建多个 Intent 过滤器。系统通过将 Intent 与所有这三个元素进行比较，根据过滤器测试隐式 Intent。一个组件可能有多个 Intent 过滤器，因此未能通过某一组件过滤器的 Intent 可能会通过另一过滤器。
+
+> 对于所有 Activity，您必须在清单文件中声明 Intent 过滤器。但是，广播接收器的过滤器可以通过调用 `registerReceiver()` 动态注册。 稍后，您可以使用 `unregisterReceiver()` 注销该接收器。这样一来，应用便可仅在应用运行时的某一指定时间段内侦听特定的广播。
+
+示例：
+
+```xml
+<activity android:name="MainActivity">
+    <!-- This activity is the main entry, should appear in app launcher -->
+    <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+    </intent-filter>
+</activity>
+
+<activity android:name="ShareActivity">
+    <!-- This activity handles "SEND" actions with text data -->
+    <intent-filter>
+        <action android:name="android.intent.action.SEND"/>
+        <category android:name="android.intent.category.DEFAULT"/>
+        <data android:mimeType="text/plain"/>
+    </intent-filter>
+    <!-- This activity also handles "SEND" and "SEND_MULTIPLE" with media data -->
+    <intent-filter>
+        <action android:name="android.intent.action.SEND"/>
+        <action android:name="android.intent.action.SEND_MULTIPLE"/>
+        <category android:name="android.intent.category.DEFAULT"/>
+        <data android:mimeType="application/vnd.google.panorama360+jpg"/>
+        <data android:mimeType="image/*"/>
+        <data android:mimeType="video/*"/>
+    </intent-filter>
+</activity>
+```
+
+### 6.6 待定 Intent
+
+### 6.7 Intent 解析
+
+1. 操作测试：要指定接受的 Intent 操作，Intent 过滤器既可以不声明任何 <action> 元素，也可以声明多个此类元素。要通过此过滤器，您在 Intent 中指定的操作必须与过滤器中列出的某一操作匹配。如果该过滤器未列出任何操作，则 Intent 没有任何匹配项，因此所有 Intent 均无法通过测试。 但是，如果 Intent 未指定操作，则会通过测试（只要过滤器至少包含一个操作）。
+
+   ```xml
+   <intent-filter>
+       <action android:name="android.intent.action.EDIT" />
+       <action android:name="android.intent.action.VIEW" />
+       ...
+   </intent-filter>
+   ```
+
+2. 类别测试：要指定接受的 Intent 类别， Intent 过滤器既可以不声明任何 <category> 元素，也可以声明多个此类元素。 若要使 Intent 通过类别测试，则 Intent 中的每个类别均必须与过滤器中的类别匹配。反之则未必然，Intent 过滤器声明的类别可以超出 Intent 中指定的数量，且 Intent 仍会通过测试。 Android 会自动将 CATEGORY_DEFAULT 类别应用于传递给 startActivity() 和 startActivityForResult() 的所有隐式 Intent。因此，如需 Activity 接收隐式 Intent，则必须将 "android.intent.category.DEFAULT" 的类别包括在其 Intent 过滤器中。
+
+   ```xml
+   <intent-filter>
+       <category android:name="android.intent.category.DEFAULT" />
+       <category android:name="android.intent.category.BROWSABLE" />
+       ...
+   </intent-filter>
+   ```
+
+3. 数据测试：要指定接受的 Intent 数据， Intent 过滤器既可以不声明任何 <data> 元素，也可以声明多个此类元素。每个 <data> 元素均可指定 URI 结构和数据类型（MIME 媒体类型）。 URI 的每个部分均包含单独的 scheme、host、port 和 path 属性：<scheme>://<host>:<port>/<path>。在 <data> 元素中，上述每个属性均为可选，但存在线性依赖关系：
+
+   * 如果未指定架构，则会忽略主机。
+   * 如果未指定主机，则会忽略端口。
+   * 如果未指定架构和主机，则会忽略路径。
+
+   ```xml
+   <intent-filter>
+       <data android:mimeType="video/mpeg" android:scheme="http" ... />
+       <data android:mimeType="audio/mpeg" android:scheme="http" ... />
+       ...
+   </intent-filter>
+   ```
+
+   数据测试会将 Intent 中的 URI 和 MIME 类型与过滤器中指定的 URI 和 MIME 类型进行比较。
+
+### 6.8 Intent 匹配
+
+`PackageManager` 提供了一整套 `query...()` 方法来返回所有能够接受特定 Intent 的组件。此外，它还提供了一系列类似的 `resolve...()` 方法来确定响应 Intent 的最佳组件。 例如，`queryIntentActivities()` 将返回能够执行那些作为参数传递的 Intent 的所有 Activity 列表，而 `queryIntentServices()` 则可返回类似的服务列表。这两种方法均不会激活组件，而只是列出能够响应的组件。 对于广播接收器，有一种类似的方法： `queryBroadcastReceivers()`。
+
 
 
 
