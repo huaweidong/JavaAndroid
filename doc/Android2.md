@@ -6,7 +6,7 @@
 
 流程模型图
 
-![](http://www.runoob.com/wp-content/uploads/2015/07/4109430.jpg)
+![](img/4109430.jpg)
 
 事件监听机制中由**事件源**，**事件**，**事件监听器**三类对象组成 处理流程如下: 
 
@@ -141,7 +141,7 @@ public class MyButton extends Button{
 
 #### 1.2.2 基于回调的事件传播
 
-![](http://www.runoob.com/wp-content/uploads/2015/07/9989678.jpg)
+![](img/9989678.jpg)
 
 倘若为false，表示事件未处理完，会继续传播，无论是Listener还是回调方法都是。
 
@@ -1138,11 +1138,11 @@ String[] str = bd.getStringArray("StringArray");
 
 >  两者的比较:
 >
-> 1）在使用内存的时候，Parcelable比Serializable性能高，所以推荐使用Parcelable。
+>  1）在使用内存的时候，Parcelable比Serializable性能高，所以推荐使用Parcelable。
 >
-> 2）Serializable在序列化的时候会产生大量的临时变量，从而引起频繁的GC。
+>  2）Serializable在序列化的时候会产生大量的临时变量，从而引起频繁的GC。
 >
-> 3）Parcelable不能使用在要将数据存储在磁盘上的情况，因为Parcelable不能很好的保证数据的 持续性在外界有变化的情况下。尽管Serializable效率低点，但此时还是建议使用Serializable。
+>  3）Parcelable不能使用在要将数据存储在磁盘上的情况，因为Parcelable不能很好的保证数据的 持续性在外界有变化的情况下。尽管Serializable效率低点，但此时还是建议使用Serializable。
 
 #### 6.9.5 Bitmap
 
